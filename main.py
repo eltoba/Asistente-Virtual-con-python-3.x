@@ -87,8 +87,8 @@ def procesadorDeFunciones(accion_requerida):
             main(ejecutar)  # retornamos al inicio
 
 def terminar():
-    voz_asistente(leerNotas('frase 3'))
-    print(leerNotas('frase 3'))
+    voz_asistente(leerNotas('frase 10'))
+    print(leerNotas('frase 10'))
 
 if __name__=='__main__':
     main()
