@@ -7,7 +7,7 @@
 # Created:     06/05/2016
 # Copyright:   (c) Mauricio 2016
 # Licence:     <licencia?? que es eso??>
-# Version:     0.0.04
+# Version:     0.0.01
 #-------------------------------------------------------------------------------
 ''' importamos el modulo "CSV" de python '''
 import csv
