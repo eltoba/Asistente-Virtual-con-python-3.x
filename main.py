@@ -84,7 +84,7 @@ def procesadorDeFunciones(accion_requerida):
                 de que manera se llama al módulo (la frase con la que se invoca) """
             voz_asistente(r'Función no encontrada')  # se descomenta solo para testeos modulos.controlAudio.voz_asistente
             print(r"Función no encontrada")  # se descomenta solo para testeos
-            main('1')  # retornamos al inicio
+            main(ejecutar)  # retornamos al inicio
 
 def terminar():
     voz_asistente(leerNotas('frase 3'))
