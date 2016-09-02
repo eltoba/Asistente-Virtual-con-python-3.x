@@ -1,140 +1,94 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        Asistente virtual con pyttsx
 # Purpose:     El siguiente proyecto pretende crear un asistente personal basado
-#              en pyttsx y python 2.7
-# Author:      Mauricio Jose Tobares
+#              en python 3.x
+# Author:      Mauricio José Tobares
 # Created:     06/05/2016
 # Copyright:   (c) Mauricio 2016
 # Licence:     <licencia?? que es eso??>
-# Version:     0.0.01
+# Version:     0.0.03
 #-------------------------------------------------------------------------------
-# Modulo os
-import os
-# Modulo RE
-import re
-# Modulo CSV de python
-from csv import *
-# Modulo operator de python
-import operator
-# Modulo de control hablar/escuchar creado por mi para el manejo de la voz
-import ModVoz
-# Modulo dialogos (este es el modulo que maneja el diccionario de dialogos)
-import ModLeercsv
-# Modulo time de python
-import time
-# Modulo GetPass
+# se importa el modulo getpass que en windows sirve para averiguar el nombre
+# del usuario pc
 import getpass
+# Modulo time de python, necesario para trabajar con tiempos
+import time
+#-------------------------------------------------------------------------------
+# importamos los modulos propios necesarios y asignamos un alias adecuado
+#-------------------------------------------------------------------------------
+# el módulo controlAudio se utiliza para trabajar con la voz del asistente y
+# tomar capturas del micrófono
+from modulos.controlAudio import *
+# el módulo hablar es el encargado de entablar conversación con el usuario y a
+# la vez es el lugar donde se le pueden enseñar nuevos diálogos al asistente
+from modulos.hablar import *
+# import modulos.hablar as ModHablar
+# el módulo leercsv se utiliza para trabajar con los archivos csv
+from modulos.leercsv import *
 
-def main():
-    """ este es el inicio del programa y donde se retorna continuamente """
+def main(vuelta=0):
+    ' Esta función es la entrada al programa. '
+    """ La función main es la que se encarga de recibir al usuario y preguntarle
+        que es lo que quiere hacer, si es la primera vez que el usuario enciende
+        el asistente le dará la bienvenida, si no es así y ya se encuentra
+        utilizando el asistente no le dará la bienvenida, simplemente le
+        preguntará que quiere hacer """
+    if vuelta == 0:
 # traemos el dialogo de saludo
-    frase1 = ModLeercsv.leerNotas('frase 1')
-    frase2 = ModLeercsv.leerNotas('frase 2')
-    usuario = getpass.getuser()
-    holaUsuario = frase1+usuario+frase2
-# hacemos que lea este mensaje
-    ModVoz.hablar(holaUsuario)
-# imrpimimos en la consola el mensaje
-    print(holaUsuario)
-# lo primero lo primero definimos como vacio nombre_de_la_funcion
-#    nombre_de_la_funcion = ModVoz.escuchar()
-    nombre_de_la_funcion = raw_input() # solo para testeos
+        frase1 = leerNotas('frase 1')  # modulos.leercsv.leerNotas
+# asignamos el nombre del usuario pc a una variable para luego utilizarla
+        usuario = getpass.getuser()
+# segundo diálogo
+        frase2 = leerNotas('frase 2')  # modulos.leercsv.leerNotas
+# ahora lo que hacemos es unir la oración en un solo string para poder
+# utilizarlo con mayor comodidad
+        holaUsuario = frase1+usuario+frase2
+    else:
+# traemos el diálogo correspondiente (ya no saluda sino que pasa a dar opciones)
+        frase1 = leerNotas('frase 1b')  # modulos.leercsv.leerNotas
+        usuario = getpass.getuser()
+        frase2 = leerNotas('frase 2b')  # modulos.leercsv.leerNotas
+        holaUsuario = frase1+usuario+frase2  # unificamos la frase
+# hacemos que el asistente lea el mensaje adecuado
+    voz_asistente(holaUsuario)  # modulos.controlAudio.voz_asistente
+# la función escuchar del modulo de voz todavía no funciona
+#    nombre_de_la_funcion = escuchar()  # se comenta para testear / modulos.controlVoz.escuchar
+    accion_requerida = input(holaUsuario)
 # enviamos los datos a procesar a la siguiente funcion
-    procesadorDeFunciones(nombre_de_la_funcion)
+    procesadorDeFunciones(accion_requerida)
 
-def procesadorDeFunciones(nombre_de_la_funcion):
-    """ Esta funcion recibe un dato y comprueba si existe una funcion con ese
-    nombre y la ejecuta, caso contrario entrega un mensaje al usuario informando
-    de ello y dando una nueva opcion para una nueva tarea."""
-# empecemos con RE, tomamos el valor que viene de main y la procesamos para
-# saber que es lo que quiere el usuario (un poco adivinando porque a veces el
-# asistente NO ENTIENDE muy bien lo que decimos y por tanto un poco de
-# expresiones regulares soluciona en parte este problema
-
-    re_nombre_de_la_funcion = re.search(r'(.*)abl(.*)', nombre_de_la_funcion)
-    if re.search(r'trabaj', nombre_de_la_funcion) == nombre_de_la_funcion:
-        nombre_de_la_funcion = 'trabajar'
-    elif re.search(r'abla', nombre_de_la_funcion) == nombre_de_la_funcion:
-        nombre_de_la_funcion = 'hablar'
+def procesadorDeFunciones(accion_requerida):
+    ' esta función es un pequeño arbol de decisiones. '
+    """ A esta función llegan las decisiones que el usuario toma, la función
+        analiza si la decisión es válida y procede a ejecutar el módulo que
+        corresponda a dicha acción, caso contrario entrega un mensaje al usuario
+        informando de ello y dando una nueva opción para una nueva tarea. """
+    ejecutar = acciones(accion_requerida)  # modulos.leercsv.acciones
+    """ todo programa tiene que tener una forma de detenerlo ya que de otra
+        forma entraría en un bucle infinito y no es bueno que eso suceda """
+    if 'terminar' in ejecutar:
+        terminar()
     else:
-# aca hay que agregar el NO ENTIENDO LO QUE DICES!!
-        nombre_de_la_funcion = nombre_de_la_funcion
+        """ el siguiente if genera una función sin nombre, consulta al sistema si
+            existe una función con el nombre requerido y lo ejecuta, caso contrario
+            da aviso de ello al usuario """
+        if ejecutar in globals():  # existe la funcion en modo global?
+            if callable(globals()[ejecutar]):  # se puede acceder a dicha función?
+                main(globals()[ejecutar]())  # ejecutamos la acción requerida y retornamos al inicio
+        else:  # caso contrario utilizaremos este bloque para otras acciones
+            """ en este bloque lo que haremos es en primera instancia crear un
+            módulo que sea capaz de crear módulos básicos pidiendo al usuario los
+            siguientes datos:
+                nombre del módulo
+                de que manera se llama al módulo (la frase con la que se invoca) """
+            voz_asistente(r'Función no encontrada')  # se descomenta solo para testeos modulos.controlAudio.voz_asistente
+            print(r"Función no encontrada")  # se descomenta solo para testeos
+            main('1')  # retornamos al inicio
 
-    if nombre_de_la_funcion in globals():
-        if callable(globals()[nombre_de_la_funcion]):
-            frase3 = ModLeercsv.leerNotas('frase 3')
-            print(frase3,nombre_de_la_funcion)
-            ModVoz.hablar(frase3)
-            ModVoz.hablar(nombre_de_la_funcion)
-# agregamos una espera de un segundo porque de no ser así pasaría directamente a
-# ejecutar la funcion sin mostrar el mensaje por consola ni pronunciar el mensaje
-            time.sleep(1)
-# ejecutamos la funcion
-            return globals()[nombre_de_la_funcion]()
-    else:
-        frase4a = ModLeercsv.leerNotas('frase 4 a')
-        frase4b = ModLeercsv.leerNotas('frase 4 b')
-        print(frase4a,nombre_de_la_funcion,frase4b)
-        frase = str(frase4a)+str(nombre_de_la_funcion)+str(frase4b)
-        ModVoz.hablar(frase)
-        siono = ''
-#        siono = ModVoz.escuchar()
-        siono = raw_input('todavia no lo has programado, deseas programarlo? si o no: ') # solo para testeos
-        if siono == 'si':
-            frase5 = ModLeercsv.leerNotas('frase 5')
-            print(frase5)
-            ModVoz.hablar(frase5)
-            time.sleep(1)
-            return main()
-        elif siono == 'no':
-            frase6 = ModLeercsv.leerNotas('frase 6')
-            print(frase6)
-            ModVoz.hablar(frase6)
-            time.sleep(1)
-            return main()
-        else:
-            return main()
-
-def hablar():
-    """ funcion de ejemplo que solo dice \"hola\" y retorna al inicio """
-    print "esto es una funcion que dice HOLA!!"
-    dialogo = "esto es una funcion que dice HOLA!!"
-    ModVoz.hablar(dialogo)
-
-# creamos un retardo y devolvemos al inicio
-#    time.sleep(1)
-#    main()
-
-def trabajar():
-    """ esta funcion es un ejemplo de como se puede manejar un arbol de opciones
-    y tomar decisiones segun corresponda """
-    print('esto es tu oficina de trabajo, en que deseas trabajar?')
-    ModVoz.hablar('esto es tu oficina de trabajo, en que deseas trabajar?')
-# recojemos la informacion que nos brinda el usuario
-    accion = raw_input('esto es tu oficina de trabajo, en que deseas trabajar? ')
-    if accion == '': # si no escucha nada devolvemos al inicio
-        main()
-    elif accion == 'nada': # si el usuario no quiere hacer nada devolvemos al inicio
-        main()
-    elif accion == 'escribir':
-# traemos el dialogo que se debe mostrar y decir
-        frase = 'abriendo notepad'
-        dialogo = ModLeercsv.leerNotas(frase)
-        print(dialogo)
-        ModVoz.hablar(dialogo)
-# abrimos el notepad indicando la ruta hacia la aplicacion (no se como se hace en linux)
-        os.system('C:\Windows\System32\notepad.exe')
-# una vez lanzada la aplicacion creamos un retardo y devolvemos al inicio
-#        time.sleep(1)
-#        main()
-    else: # si ninguna de las opciones anteriores se produce devolvemos al inicio
-        main()
+def terminar():
+    voz_asistente(leerNotas('frase 3'))
+    print(leerNotas('frase 3'))
 
 if __name__=='__main__':
     main()
-## cuando el asistente diga "hola {usuario} en que puedo ayudarlo? podemos
-## indicarle el nombre de la funcion que queremos que ejecute, en nuestro caso
-## solo existen 2, trabajar y hablar, pero en las siguientes versiones se
-## agregaran mas modulos para que el asistente sea mas util
