@@ -19,3 +19,6 @@ def voz_asistente(frase):
         debe pronunciar el asistente """
     speaker = win32com.client.Dispatch("SAPI.SpVoice")
     speaker.Speak(frase)
+
+def escuchar():
+    pass
