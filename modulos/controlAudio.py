@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:        ControlVoz.py
+# Name:        ControlAudio.py
 # Purpose:     Como se trabajará en windows (por ahora) se utilizará para el
 #              manejo de las voces win32com.client
 # Author:      Mauricio José Tobares
@@ -9,16 +9,18 @@
 # Licence:     <licencia?? que es eso??>
 # Version:     0.0.02
 #-------------------------------------------------------------------------------
-# modulo win32com.client de python para utilizar tts de windows
-import win32com.client
-
 def voz_asistente(frase):
     ' Función que facilita la utilización de la voz del asistente. '
-    """ Esta función lo que hace es cargar el driver necesario para utilizar el
-        tts en sistemas windows y se le pasan como argumentos las frases que
-        debe pronunciar el asistente """
-    speaker = win32com.client.Dispatch("SAPI.SpVoice")
-    speaker.Speak(frase)
-
-def escuchar():
-    pass
+    """ Esta función lo que hace es, en primera medida cargar pyttsx como módulo
+    propio, ya que este pyttsx es una modificación y adaptación para que
+    funcione en python 3.x.
+    A esta función se le pasa como argumento las frases que debe pronunciar el
+    asistente. """
+    import pyttsx
+    engine = pyttsx.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('voices', 'spanish')
+    engine.setProperty('rate', 120)
+    engine.say(frase)
+    engine.runAndWait()
+    print(frase)
