@@ -7,7 +7,7 @@
 # Created:     06/05/2016
 # Copyright:   (c) Mauricio 2016
 # Licence:     <licencia?? que es eso??>
-# Version:     0.0.03
+# Version:     0.0.05
 #-------------------------------------------------------------------------------
 # se importa el modulo getpass que en windows sirve para averiguar el nombre
 # del usuario pc
@@ -15,7 +15,7 @@ import getpass
 # Modulo time de python, necesario para trabajar con tiempos
 import time
 #-------------------------------------------------------------------------------
-# importamos los modulos propios necesarios y asignamos un alias adecuado
+# importamos los modulos propios necesarios
 #-------------------------------------------------------------------------------
 # el módulo controlAudio se utiliza para trabajar con la voz del asistente y
 # tomar capturas del micrófono
@@ -23,9 +23,11 @@ from modulos.controlAudio import *
 # el módulo hablar es el encargado de entablar conversación con el usuario y a
 # la vez es el lugar donde se le pueden enseñar nuevos diálogos al asistente
 from modulos.hablar import *
-# import modulos.hablar as ModHablar
 # el módulo leercsv se utiliza para trabajar con los archivos csv
 from modulos.leercsv import *
+# el módulo navegadores facilita abrir navegadores así como la apertura de
+# páginas web
+from modulos.navegadores import *
 
 def main(vuelta=0):
     ' Esta función es la entrada al programa. '
@@ -52,8 +54,9 @@ def main(vuelta=0):
         holaUsuario = frase1+usuario+frase2  # unificamos la frase
 # hacemos que el asistente lea el mensaje adecuado
     voz_asistente(holaUsuario)  # modulos.controlAudio.voz_asistente
-# la función escuchar del modulo de voz todavía no funciona
-#    nombre_de_la_funcion = escuchar()  # se comenta para testear / modulos.controlVoz.escuchar
+# la función escuchar del modulo de voz todavía no funciona y por tanto se
+# comenta para testear / modulos.controlVoz.escuchar
+#    accion_requerida = escuchar()
     accion_requerida = input(holaUsuario)
 # enviamos los datos a procesar a la siguiente funcion
     procesadorDeFunciones(accion_requerida)
@@ -67,7 +70,8 @@ def procesadorDeFunciones(accion_requerida):
     ejecutar = acciones(accion_requerida)  # modulos.leercsv.acciones
     """ todo programa tiene que tener una forma de detenerlo ya que de otra
         forma entraría en un bucle infinito y no es bueno que eso suceda """
-    if 'terminar' in ejecutar:
+    if r'terminar' in ejecutar:
+        print(r'terminando...')
         terminar()
     else:
         """ el siguiente if genera una función sin nombre, consulta al sistema si
@@ -82,13 +86,14 @@ def procesadorDeFunciones(accion_requerida):
             siguientes datos:
                 nombre del módulo
                 de que manera se llama al módulo (la frase con la que se invoca) """
-            voz_asistente(r'Función no encontrada')  # se descomenta solo para testeos modulos.controlAudio.voz_asistente
-            print(r"Función no encontrada")  # se descomenta solo para testeos
+            voz_asistente(r'Funcion no encontrada')  # se descomenta solo para testeos modulos.controlAudio.voz_asistente
+            print(r'Funcion no encontrada')  # se descomenta solo para testeos
             main(ejecutar)  # retornamos al inicio
 
 def terminar():
     voz_asistente(leerNotas('frase 10'))
     print(leerNotas('frase 10'))
+
 
 if __name__=='__main__':
     main()
