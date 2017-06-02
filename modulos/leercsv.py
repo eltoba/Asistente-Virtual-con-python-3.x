@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:        Módulo leercsv
+# Name:        Módulo leercsv.py
 # Purpose:     Módulo encargado de recuperar datos del archivo frases.csv y
 #              acciones.csv
 # Author:      Mauricio José Tobares
@@ -23,7 +23,7 @@ def leerNotas(fraseNum):
 # Crear nuevo dialecto llamado 'personal' con el que está formateado el csv
     csv.register_dialect('personal', delimiter='|', quotechar='"', quoting=csv.QUOTE_ALL)
 # abrimos el archivo con el que trabajaremos
-    with open('frases.csv') as csvarchivo:
+    with open('csv/frases.csv') as csvarchivo:
         entrada = csv.reader(csvarchivo, dialect='personal')
 # en este bucle lo que hacemos es cargar los valores al diccionario vacío
         for datos in entrada:
@@ -48,7 +48,7 @@ def acciones(accionNum):
 # Crear nuevo dialecto llamado 'personal' con el que está formateado el csv
     csv.register_dialect('personal', delimiter='|', quotechar='"', quoting=csv.QUOTE_ALL)
 # abrimos el archivo con el que trabajaremos
-    with open('acciones.csv') as csvarchivo:
+    with open('csv/acciones.csv') as csvarchivo:
         entrada = csv.reader(csvarchivo, dialect='personal')
 # en este bucle lo que hacemos es cargar los valores al diccionario vacío
         for datos in entrada:
